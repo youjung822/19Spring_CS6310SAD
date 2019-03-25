@@ -18,7 +18,7 @@ public class Main {
 
         // Summary Panel
         JPanel summaryPanel = new JPanel();
-        summaryPanel.setLayout(new GridLayout(1, 6));
+        summaryPanel.setLayout(new GridLayout(1, 8));
 
         JLabel turnLabel = new JLabel();
         turnLabel.setText("Turns Taken:");
@@ -44,6 +44,14 @@ public class Main {
         grassCutField.setEditable(false);
         summaryPanel.add(grassCutField);
 
+        JLabel nextTurnLabel = new JLabel();
+        nextTurnLabel.setText("Next Turn:");
+        summaryPanel.add(nextTurnLabel);
+        JTextField nextTurnField = new JTextField();
+        nextTurnField.setText("");
+        nextTurnField.setEditable(false);
+        summaryPanel.add(nextTurnField);
+
         frame.add(summaryPanel, BorderLayout.PAGE_START);
 
         // Lawn Panel
@@ -61,9 +69,12 @@ public class Main {
         JButton nextButton = new JButton("Next");
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (monitor.isStopped()) {
+                    JOptionPane.showMessageDialog(frame, "Simulation has ended");
+                }
                 try {
                     monitor.next();
-                    render(turnField, monitor, grassCutField, grassRemField, lawnPanel, statusPanel, frame);
+                    render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                 } catch (Exception ex) {
                     //do nothing
                 }
@@ -88,9 +99,12 @@ public class Main {
         JButton ffButton = new JButton("Fast-Forward");
         ffButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (monitor.isStopped()) {
+                    JOptionPane.showMessageDialog(frame, "Simulation has ended");
+                }
                 try {
                     monitor.fastForward();
-                    render(turnField, monitor, grassCutField, grassRemField, lawnPanel, statusPanel, frame);
+                    render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                 } catch (Exception ex) {
                     //do nothing
                 }
@@ -113,7 +127,7 @@ public class Main {
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = jfc.getSelectedFile();
                     monitor.setupUsingFile(selectedFile.getAbsolutePath());
-                    render(turnField, monitor, grassCutField, grassRemField, lawnPanel, statusPanel, frame);
+                    render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                 }
             }
         });
@@ -124,10 +138,16 @@ public class Main {
         frame.setVisible(true);
     }
 
-    private static void render(JTextField turnField, SimulationMonitor monitor, JTextField grassCutField, JTextField grassRemField, JPanel lawnPanel, JPanel statusPanel, JFrame frame) {
+    private static void render(JTextField turnField, SimulationMonitor monitor, JTextField grassCutField, JTextField grassRemField, JTextField nextTurnField, JPanel lawnPanel, JPanel statusPanel, JFrame frame) {
         turnField.setText(monitor.getTurnCount() + "");
         grassCutField.setText(monitor.getGrassCut() + "");
         grassRemField.setText(monitor.getGrassRemaining() + "");
+        Object no = monitor.getNextObject();
+        if (no instanceof Mower) {
+            nextTurnField.setText("Mower: " + ((Mower) no).getId());
+        } else {
+            nextTurnField.setText("Puppy: " + ((Puppy) no).getId());
+        }
 
         //lawn panel
         lawnPanel.removeAll();
@@ -140,8 +160,6 @@ public class Main {
 
                 Location l = new Location(x, y);
                 Square sq = monitor.getSquare(l);
-
-                Object no = monitor.getNextObject();
 
                 int border = 1;
                 if (no instanceof Mower) {

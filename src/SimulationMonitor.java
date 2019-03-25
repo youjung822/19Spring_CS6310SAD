@@ -29,8 +29,13 @@ public class SimulationMonitor {
         isStopped = (turnCount > maxTurnCount) || allCrashedOrOff;
     }
 
+    public boolean isStopped() {
+        return isStopped;
+    }
+
     public void setupUsingFile(String filePath) {
         turnCount = 0;
+        isStopped = false;
 
         final String DELIMITER = ",";
 
