@@ -1,7 +1,7 @@
 # a6-85
-* Mengyi
-* Youjung
-* Roy
+* Mengyi Sun
+* Youjung Kim
+* Roy Debajyoti
 
 # Dev setup
 * Oracle JDK 1.8.0_191-b12
