@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
@@ -120,8 +121,9 @@ public class Main {
         JMenuItem newMI = new JMenuItem("Open");
         newMI.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Input File", "csv");
                 JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-
+                jfc.setFileFilter(filter);
                 int returnValue = jfc.showOpenDialog(null);
 
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
