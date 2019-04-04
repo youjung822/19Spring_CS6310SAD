@@ -26,7 +26,7 @@ public class SimulationMonitor {
                 break;
             }
         }
-        isStopped = (turnCount > maxTurnCount) || allCrashedOrOff;
+        isStopped = (turnCount >= maxTurnCount) || allCrashedOrOff;
     }
 
     public boolean isStopped() {
@@ -167,6 +167,9 @@ public class SimulationMonitor {
     }
 
     public String report() {
+        if (!isStopped) {
+            isStopped = true;
+        }
         int totalSquares = 0;
         int totalGrass = 0;
         int totalClean = 0;
@@ -226,7 +229,11 @@ public class SimulationMonitor {
                 if (nextMowerId <= mowers.size()) {
                     nextObject = mowers.get(nextMowerId - 1);
                 } else {
-                    nextObject = puppies.get(0);
+                    if (puppies.isEmpty()) {
+                        nextObject = mowers.get(0);
+                    } else {
+                        nextObject = puppies.get(0);
+                    }
                 }
             } else {
                 Puppy p = (Puppy) nextObject;
@@ -274,15 +281,22 @@ public class SimulationMonitor {
         Location[] ns = l.getNeighborLocations();
         List<Location> candidates = new ArrayList<>();
         for (Location n : ns) {
-            if (lawn.getSquares().containsKey(n) && lawn.getSquare(n) instanceof GrassSquare) {
-                for (Puppy p : puppies) {
-                    if (!p.getLocation().equals(n)) {
-                        candidates.add(n);
-                    }
-                }
+            if (lawn.getSquares().containsKey(n) &&
+                    lawn.getSquare(n) instanceof GrassSquare &&
+                    !isPuppyAtLocation(n)) {
+                candidates.add(n);
             }
         }
         return candidates;
+    }
+
+    private boolean isPuppyAtLocation(Location l) {
+        for (Puppy p : puppies) {
+            if (p.getLocation().equals(l)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean validateMowerAction(MowerAction mowerAction) {

@@ -90,7 +90,6 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     System.out.println(monitor.report());
-                    System.exit(0);
                 } catch (Exception ex) {
                     //do nothing
                 }
@@ -134,6 +133,17 @@ public class Main {
             }
         });
         menu.add(newMI);
+
+        menu.addSeparator();
+
+        JMenuItem quitMI = new JMenuItem("Quit");
+        quitMI.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        menu.add(quitMI);
+
         mb.add(menu);
         frame.setJMenuBar(mb);
 

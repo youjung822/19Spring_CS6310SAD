@@ -9,7 +9,7 @@ public class Mower {
     private int remainingTurnsStalled;
     private MowerSharedState sharedState;
 
-    private Queue<MowerAction> actionQueue = new LinkedList<>();
+    private Queue<MoveAction> actionQueue = new LinkedList<>();
 
     private Direction lastRandomDirection = null;
 
@@ -54,7 +54,16 @@ public class Mower {
     public MowerAction pollForAction() {
         if (sharedState.isWorkPending()) {
             if (!actionQueue.isEmpty()) {
-                return actionQueue.remove();
+                MoveAction a = actionQueue.remove();
+                int m = a.getMagnitude();
+                for(int i = 1; i<=m ; i++){
+                    Location destination = location.getMovedLocation(i, direction);
+                    if(sharedState.isMower(destination)){
+                        actionQueue.clear();
+                        return pollForAction();
+                    }
+                }
+                return a;
             } else if (sharedState.isScanDone(location)) {
                 //starting with current direction
                 List<Direction> directionCandidates = direction.clockwiseNextDirections();
