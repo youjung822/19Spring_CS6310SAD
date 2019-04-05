@@ -52,13 +52,17 @@ public class Mower {
     }
 
     public MowerAction pollForAction() {
+        if (getId() == 1 && sharedState.getPuppyStayPercentage() != 100) {
+            sharedState.expirePuppyLocations();
+        }
+
         if (sharedState.isWorkPending()) {
             if (!actionQueue.isEmpty()) {
                 MoveAction a = actionQueue.remove();
                 int m = a.getMagnitude();
                 for (int i = 1; i <= m; i++) {
                     Location destination = location.getMovedLocation(i, direction);
-                    if (sharedState.isMower(destination)) {
+                    if (!sharedState.isSafeLocation(destination)) {
                         actionQueue.clear();
                         return pollForAction();
                     }
@@ -75,7 +79,8 @@ public class Mower {
                     int lastGrassDistance = 0;
                     while (true) {
                         Location destinationLocation = location.getMovedLocation(maxDistance, directionCandidate);
-                        if (sharedState.getSquares().containsKey(destinationLocation) && !sharedState.isMower(destinationLocation)) {
+                        if (sharedState.getSquares().containsKey(destinationLocation)
+                                && sharedState.isSafeLocation(destinationLocation)) {
                             Square destinationSquare = sharedState.getSquares().get(destinationLocation);
                             if (destinationSquare instanceof GrassSquare) {
                                 GrassSquare destinationGrass = (GrassSquare) destinationSquare;
@@ -108,7 +113,7 @@ public class Mower {
                 for (Direction directionCandidate : directionCandidates) {
                     Location neighbor = location.getMovedLocation(1, directionCandidate);
                     Square ns = sharedState.getSquares().get(neighbor);
-                    if (ns instanceof GrassSquare && !sharedState.isMower(neighbor)) {
+                    if (ns instanceof GrassSquare && sharedState.isSafeLocation(neighbor)) {
                         grassNeighbors.add(directionCandidate);
                     }
                 }
@@ -157,16 +162,28 @@ public class Mower {
                 Direction direction = Direction.getById(i);
                 Location l = location.getMovedLocation(1, direction);
                 String name = names[i];
-                if (name.equals("grass") || name.equals("puppy_grass")) {
+                if (name.equals("grass")) {
                     sharedState.setSquare(l, new GrassSquare());
-                } else if (name.equals("empty") || name.equals("puppy_empty")) {
+                } else if (name.equals("puppy_grass")) {
+                    sharedState.setSquare(l, new GrassSquare());
+                    sharedState.addPuppyLocation(l);
+                } else if (name.equals("empty")) {
                     GrassSquare g = new GrassSquare();
                     g.cut();
                     sharedState.setSquare(l, g);
+                } else if (name.equals("puppy_empty")) {
+                    GrassSquare g = new GrassSquare();
+                    g.cut();
+                    sharedState.setSquare(l, g);
+                    sharedState.addPuppyLocation(l);
+                } else if (name.equals("puppy_mower")) {
+                    sharedState.addPuppyLocation(l);
+                } else if (name.equals("mower")) {
+                    // we already know other mowers' location => do nothing
                 } else if ((name.equals("crater"))) {
                     sharedState.setSquare(l, new CraterSquare());
                 } else if ((name.equals("fence"))) {
-                    sharedState.setSquare(l, new FenceSquare());
+                    sharedState.setSquare(l, MowerSharedState.fence);
                 }
             }
 
@@ -227,59 +244,7 @@ public class Mower {
         return Objects.hash(getId());
     }
 
-    public void renderState() {
-        int i, j;
-        int charWidth = 2 * 15 + 2;
-
-        // display the rows of the lawn from top to bottom
-        for (j = 15 - 1; j >= 0; j--) {
-            renderHorizontalBar(charWidth);
-
-            // display the Y-direction identifier
-            System.out.print(j);
-
-            // display the contents of each square on this row
-            for (i = 0; i < 15; i++) {
-                System.out.print("|");
-
-
-                if (sharedState.isMower(new Location(i, j))) {
-                    System.out.print("M");
-                } else {
-                    Square s = sharedState.getSquares().get(new Location(i, j));
-                    if (s == null) {
-                        System.out.print("?");
-                    } else if (s instanceof GrassSquare && ((GrassSquare) s).isEmpty()) {
-                        System.out.print(" ");
-                    } else if (s instanceof GrassSquare) {
-                        System.out.print("g");
-                    } else if (s instanceof CraterSquare) {
-                        System.out.print("c");
-                    } else {
-                        System.out.print("f");
-                    }
-                }
-
-            }
-            System.out.println("|");
-        }
-        renderHorizontalBar(charWidth);
-
-
-        // display the column X-direction identifiers
-        System.out.print(" ");
-        for (i = 0; i < 15; i++) {
-            System.out.print(" " + i);
-        }
-        System.out.println();
-
-    }
-
-    private void renderHorizontalBar(int size) {
-        System.out.print(" ");
-        for (int k = 0; k < size; k++) {
-            System.out.print("-");
-        }
-        System.out.println();
+    public void render() {
+        sharedState.renderState();
     }
 }

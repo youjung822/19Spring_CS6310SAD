@@ -131,6 +131,7 @@ public class Main {
 
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = jfc.getSelectedFile();
+                    frame.setTitle("OsMowSis: " + selectedFile.getName());
                     monitor.setupUsingFile(selectedFile.getAbsolutePath());
                     render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                 }
