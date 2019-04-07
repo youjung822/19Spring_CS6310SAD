@@ -10,6 +10,8 @@ import java.io.File;
 public class Main {
     private static ImageIcon puppyIcon = loadIcon("images/puppy.png");
     private static ImageIcon craterIcon = loadIcon("images/crater.png");
+    private static ImageIcon mowerIcon = loadIcon("images/mower.png");
+    private static ImageIcon puppyMowerIcon = loadIcon("images/puppyMower.png");
 
     private static ImageIcon loadIcon(String path) {
         try {
@@ -20,6 +22,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        try {
+
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+        }
         SimulationMonitor monitor = new SimulationMonitor();
 
         JFrame frame = new JFrame("OsMowSis");
@@ -33,7 +40,9 @@ public class Main {
         summaryPanel.setLayout(new GridLayout(1, 8));
 
         JLabel turnLabel = new JLabel();
-        turnLabel.setText("Turns Taken:");
+        turnLabel.setText("Turns Taken: ");
+        turnLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        turnLabel.setFont(turnLabel.getFont().deriveFont(Font.BOLD));
         summaryPanel.add(turnLabel);
         JTextField turnField = new JTextField();
         turnField.setText("0");
@@ -41,7 +50,9 @@ public class Main {
         summaryPanel.add(turnField);
 
         JLabel grassRemLabel = new JLabel();
-        grassRemLabel.setText("Grass Squares Remaining:");
+        grassRemLabel.setText("Grass Squares Remaining: ");
+        grassRemLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        grassRemLabel.setFont(grassRemLabel.getFont().deriveFont(Font.BOLD));
         summaryPanel.add(grassRemLabel);
         JTextField grassRemField = new JTextField();
         grassRemField.setText("0");
@@ -49,7 +60,9 @@ public class Main {
         summaryPanel.add(grassRemField);
 
         JLabel grassCutLabel = new JLabel();
-        grassCutLabel.setText("Grass Squares Cut:");
+        grassCutLabel.setText("Grass Squares Cut: ");
+        grassCutLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        grassCutLabel.setFont(grassCutLabel.getFont().deriveFont(Font.BOLD));
         summaryPanel.add(grassCutLabel);
         JTextField grassCutField = new JTextField();
         grassCutField.setText("0");
@@ -57,7 +70,9 @@ public class Main {
         summaryPanel.add(grassCutField);
 
         JLabel nextTurnLabel = new JLabel();
-        nextTurnLabel.setText("Next Turn:");
+        nextTurnLabel.setText("Next Turn: ");
+        nextTurnLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        nextTurnLabel.setFont(nextTurnLabel.getFont().deriveFont(Font.BOLD));
         summaryPanel.add(nextTurnLabel);
         JTextField nextTurnField = new JTextField();
         nextTurnField.setText("");
@@ -168,9 +183,9 @@ public class Main {
         grassRemField.setText(monitor.getGrassRemaining() + "");
         Object no = monitor.getNextObject();
         if (no instanceof Mower) {
-            nextTurnField.setText("Mower: " + ((Mower) no).getId());
+            nextTurnField.setText("Mower " + ((Mower) no).getId());
         } else {
-            nextTurnField.setText("Puppy: " + ((Puppy) no).getId());
+            nextTurnField.setText("Puppy " + ((Puppy) no).getId());
         }
 
         //lawn panel
@@ -179,7 +194,7 @@ public class Main {
         lawnPanel.setLayout(new GridLayout(monitor.getLawnHeight() + 1, monitor.getLawnWidth() + 1));
 
         for (int y = monitor.getLawnHeight() - 1; y >= 0; y--) {
-            lawnPanel.add(getSquare(y + "", Color.lightGray, 1));
+            lawnPanel.add(getSquare(y + "", Color.LIGHT_GRAY, 1));
             for (int x = 0; x < monitor.getLawnWidth(); x++) {
 
                 Location l = new Location(x, y);
@@ -199,27 +214,33 @@ public class Main {
                 JLabel label = null;
 
                 if (sq instanceof GrassSquare && ((GrassSquare) sq).isEmpty()) {
-                    label = getSquare("", Color.white, border);
+                    label = getSquare("", Color.WHITE, border);
                 } else if (sq instanceof GrassSquare && !((GrassSquare) sq).isEmpty()) {
                     label = getSquare("", Color.GREEN, border);
                 } else if (sq instanceof CraterSquare) {
-                    label = getSquare("", Color.darkGray, 1);
+                    label = getSquare("", Color.DARK_GRAY, 1);
                     label.setIcon(craterIcon);
-                }
-
-                for (Puppy puppy : monitor.getPuppies()) {
-                    if (l.equals(puppy.getLocation())) {
-                        label.setIcon(puppyIcon);
-                    }
                 }
 
                 for (Mower mower : monitor.getMowers()) {
                     if (l.equals(mower.getLocation())) {
                         Direction d = mower.getDirection();
                         int id = mower.getId();
-                        label.setText("M" + id + " " + d.getShortName());
+                        label.setText(id + "(" + d.getShortName() + ")");
+                        label.setIcon(mowerIcon);
+
                         label.setFont(label.getFont().deriveFont(Font.BOLD));
 
+                    }
+                }
+
+                for (Puppy puppy : monitor.getPuppies()) {
+                    if (l.equals(puppy.getLocation())) {
+                        if (label.getIcon() != null) {
+                            label.setIcon(puppyMowerIcon);
+                        } else {
+                            label.setIcon(puppyIcon);
+                        }
                     }
                 }
 
@@ -230,13 +251,13 @@ public class Main {
         lawnPanel.add(new JLabel());
 
         for (int x = 0; x < monitor.getLawnWidth(); x++) {
-            lawnPanel.add(getSquare(x + "", Color.lightGray, 1));
+            lawnPanel.add(getSquare(x + "", Color.LIGHT_GRAY, 1));
         }
 
         //Status panel
         statusPanel.removeAll();
 
-        String[] columnNames = {"Mower", "Status", "Remaining Turns Stalled"};
+        String[] columnNames = {"Mower ID", "Status", "Rem. Turns"};
 
         Object[][] data = new Object[monitor.getMowers().size()][3];
 
@@ -248,23 +269,25 @@ public class Main {
         JTable table = new JTable(data, columnNames) {
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component returnComp = super.prepareRenderer(renderer, row, column);
-                Color alternateColor = Color.lightGray;
+                Color alternateColor = new Color(255, 230, 230);
                 Color whiteColor = Color.WHITE;
                 if (!returnComp.getBackground().equals(getSelectionBackground())) {
                     Color bg = (row % 2 == 0 ? alternateColor : whiteColor);
                     returnComp.setBackground(bg);
-                    bg = null;
                 }
                 return returnComp;
             }
         };
+        table.setEnabled(false);
         statusPanel.setLayout(new BorderLayout());
+        table.getTableHeader().setFont(table.getTableHeader().getFont().deriveFont(Font.BOLD));
         statusPanel.add(table.getTableHeader(), BorderLayout.PAGE_START);
         statusPanel.add(table, BorderLayout.CENTER);
 
-        table.getColumnModel().getColumn(0).setMaxWidth(50);
+        table.getColumnModel().getColumn(0).setMaxWidth(100);
         table.getColumnModel().getColumn(0).setMaxWidth(100);
         table.getColumnModel().getColumn(0).setMaxWidth(200);
+        table.setRowHeight(60);
 
         frame.repaint();
         frame.setVisible(true);
@@ -280,7 +303,7 @@ public class Main {
         if (border == 1) {
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK, border));
         } else if (border == 6) {
-            label.setBorder(BorderFactory.createLineBorder(Color.RED, border));
+            label.setBorder(BorderFactory.createLineBorder(Color.MAGENTA, border));
         }
         return label;
     }
