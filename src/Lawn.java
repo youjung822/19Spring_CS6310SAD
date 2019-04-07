@@ -53,16 +53,4 @@ public class Lawn {
                 && squares.containsKey(location)
                 && squares.get(location) instanceof GrassSquare;
     }
-
-    public boolean isClean() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Square sq = squares.get(new Location(x, y));
-                if (sq instanceof GrassSquare && !((GrassSquare) sq).isEmpty()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 }

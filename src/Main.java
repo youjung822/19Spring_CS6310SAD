@@ -8,12 +8,19 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 public class Main {
-    private static ImageIcon puppyIcon = new ImageIcon(Main.class.getResource("images/puppy.png"));
-    private static ImageIcon craterIcon = new ImageIcon(Main.class.getResource("images/crater.png"));
+    private static ImageIcon puppyIcon = loadIcon("images/puppy.png");
+    private static ImageIcon craterIcon = loadIcon("images/crater.png");
+
+    private static ImageIcon loadIcon(String path) {
+        try {
+            return new ImageIcon(Main.class.getResource(path));
+        } catch (NullPointerException ex) {
+            return new ImageIcon(path);
+        }
+    }
 
     public static void main(String[] args) {
         SimulationMonitor monitor = new SimulationMonitor();
-
 
         JFrame frame = new JFrame("OsMowSis");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
