@@ -3,7 +3,9 @@ cd ./dist
 rm -rf *
 cp ../src/*.java .
 javac *.java
-jar cfe osmowsis.jar Main *.class
-zip osmowsis_sources.zip *.java
+cp -r ../images .
+jar cfe osmowsis.jar Main *.class images
+zip -r osmowsis_sources.zip *.java images
 rm -rf *.java
 rm -rf *.class
+rm -rf images

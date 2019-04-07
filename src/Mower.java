@@ -56,9 +56,9 @@ public class Mower {
             if (!actionQueue.isEmpty()) {
                 MoveAction a = actionQueue.remove();
                 int m = a.getMagnitude();
-                for(int i = 1; i<=m ; i++){
+                for (int i = 1; i <= m; i++) {
                     Location destination = location.getMovedLocation(i, direction);
-                    if(sharedState.isMower(destination)){
+                    if (sharedState.isMower(destination)) {
                         actionQueue.clear();
                         return pollForAction();
                     }

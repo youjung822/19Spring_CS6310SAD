@@ -8,12 +8,16 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 public class Main {
+    private static ImageIcon puppyIcon = new ImageIcon(Main.class.getResource("images/puppy.png"));
+    private static ImageIcon craterIcon = new ImageIcon(Main.class.getResource("images/crater.png"));
+
     public static void main(String[] args) {
         SimulationMonitor monitor = new SimulationMonitor();
 
+
         JFrame frame = new JFrame("OsMowSis");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1280, 800);
+        frame.setSize(1500, 900);
 
         frame.setLayout(new BorderLayout());
 
@@ -184,20 +188,20 @@ public class Main {
                     }
                 }
 
-                JTextField field = null;
+                JLabel label = null;
 
                 if (sq instanceof GrassSquare && ((GrassSquare) sq).isEmpty()) {
-                    field = getSquare("", Color.white, border);
+                    label = getSquare("", Color.white, border);
                 } else if (sq instanceof GrassSquare && !((GrassSquare) sq).isEmpty()) {
-                    field = getSquare("", Color.green, border);
+                    label = getSquare("", Color.GREEN, border);
                 } else if (sq instanceof CraterSquare) {
-                    field = getSquare("", Color.darkGray, 1);
+                    label = getSquare("", Color.darkGray, 1);
+                    label.setIcon(craterIcon);
                 }
 
                 for (Puppy puppy : monitor.getPuppies()) {
                     if (l.equals(puppy.getLocation())) {
-                        int id = puppy.getId();
-                        field.setText("P" + id);
+                        label.setIcon(puppyIcon);
                     }
                 }
 
@@ -205,15 +209,13 @@ public class Main {
                     if (l.equals(mower.getLocation())) {
                         Direction d = mower.getDirection();
                         int id = mower.getId();
-                        if (field.getText().isEmpty()) {
-                            field.setText("M" + id + "(" + d.getShortName() + ")");
-                        } else {
-                            field.setText(field.getText() + "/M" + id + "(" + d.getShortName() + ")");
-                        }
+                        label.setText("M" + id + " " + d.getShortName());
+                        label.setFont(label.getFont().deriveFont(Font.BOLD));
+
                     }
                 }
 
-                lawnPanel.add(field);
+                lawnPanel.add(label);
             }
         }
 
@@ -260,17 +262,18 @@ public class Main {
         frame.setVisible(true);
     }
 
-    private static JTextField getSquare(String text, Color c, int border) {
-        JTextField field = new JTextField();
-        field.setText(text);
-        field.setHorizontalAlignment(JTextField.CENTER);
-        field.setBackground(c);
+
+    private static JLabel getSquare(String text, Color c, int border) {
+        JLabel label = new JLabel();
+        label.setText(text);
+        label.setHorizontalAlignment(JLabel.CENTER);
+        label.setOpaque(true);
+        label.setBackground(c);
         if (border == 1) {
-            field.setBorder(BorderFactory.createLineBorder(Color.BLACK, border));
+            label.setBorder(BorderFactory.createLineBorder(Color.BLACK, border));
         } else if (border == 6) {
-            field.setBorder(BorderFactory.createLineBorder(Color.RED, border));
+            label.setBorder(BorderFactory.createLineBorder(Color.RED, border));
         }
-        field.setEditable(false);
-        return field;
+        return label;
     }
 }

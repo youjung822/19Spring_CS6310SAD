@@ -34,14 +34,14 @@ public enum Direction {
     }
 
     public String getShortName() {
-        if (this.equals(north)) return "N";
-        else if (this.equals(northeast)) return "NE";
-        else if (this.equals(east)) return "E";
-        else if (this.equals(southeast)) return "SE";
-        else if (this.equals(south)) return "S";
-        else if (this.equals(southwest)) return "SW";
-        else if (this.equals(west)) return "W";
-        else if (this.equals(northwest)) return "NW";
+        if (this.equals(north)) return "↑";
+        else if (this.equals(northeast)) return "↗";
+        else if (this.equals(east)) return "→";
+        else if (this.equals(southeast)) return "↘";
+        else if (this.equals(south)) return "↓";
+        else if (this.equals(southwest)) return "↙";
+        else if (this.equals(west)) return "←";
+        else if (this.equals(northwest)) return "↖";
         else return "?";
     }
 
