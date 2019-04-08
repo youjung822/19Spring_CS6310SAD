@@ -59,13 +59,13 @@ public class SimulationMonitor {
             tokens = takeCommand.nextLine().split(DELIMITER);
             collisionDelay = Integer.parseInt(tokens[0]);
 
-            MowerSharedState sharedShate = new MowerSharedState();
+            MowerSharedState sharedState = new MowerSharedState();
 
             for (k = 1; k <= numMowers; k++) {
                 tokens = takeCommand.nextLine().split(DELIMITER);
                 Location l = new Location(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
                 Direction d = Direction.valueOf(tokens[2]);
-                mowers.add(new Mower(k, l, d, sharedShate));
+                mowers.add(new Mower(k, l, d, sharedState));
             }
 
             // read in the crater information
@@ -86,6 +86,8 @@ public class SimulationMonitor {
 
             tokens = takeCommand.nextLine().split(DELIMITER);
             int stayPercentage = Integer.parseInt(tokens[0]);
+
+            sharedState.setPuppyStayPercentage(stayPercentage);
 
             for (k = 1; k <= numPuppies; k++) {
                 tokens = takeCommand.nextLine().split(DELIMITER);
@@ -200,7 +202,6 @@ public class SimulationMonitor {
         if (!isStopped) {
             if (nextObject instanceof Mower) {
                 Mower m = (Mower) nextObject;
-                //m.renderState();
                 if (m.getStatus().equals(MowerStatus.TurnedOn)) {
                     System.out.println("mower," + m.getId());
                     MowerAction action = m.pollForAction();
@@ -235,6 +236,7 @@ public class SimulationMonitor {
                         nextObject = puppies.get(0);
                     }
                 }
+                //m.render();
             } else {
                 Puppy p = (Puppy) nextObject;
                 System.out.println("puppy," + p.getId());
@@ -312,6 +314,16 @@ public class SimulationMonitor {
                 for (Puppy p : puppies) {
                     if (p.getLocation().equals(n)) {
                         names[i] = "puppy_" + names[i];
+                    }
+                }
+
+                for (Mower m : mowers) {
+                    if (m.getLocation().equals(n)) {
+                        if (names[i].startsWith("puppy")) {
+                            names[i] = "puppy_mower";
+                        } else {
+                            names[i] = "mower";
+                        }
                     }
                 }
             }
