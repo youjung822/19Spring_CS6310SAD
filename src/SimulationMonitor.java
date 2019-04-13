@@ -123,8 +123,6 @@ public class SimulationMonitor {
             nextObject = mowers.get(0);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println();
         }
     }
 
@@ -203,16 +201,16 @@ public class SimulationMonitor {
             if (nextObject instanceof Mower) {
                 Mower m = (Mower) nextObject;
                 if (m.getStatus().equals(MowerStatus.TurnedOn)) {
-                    System.out.println("mower," + m.getId());
+                    Main.writeln("mower," + m.getId());
                     MowerAction action = m.pollForAction();
                     MowerFeedback feedback = null;
-                    System.out.println(action);
+                    Main.writeln(action.toString());
                     if (validateMowerAction(action)) {
                         feedback = createMowerFeedback(m, action);
                     } else {
                         feedback = new CrashFeedback(action);
                     }
-                    System.out.println(feedback);
+                    Main.writeln(feedback.toString());
                     m.processFeedback(feedback);
                 }
 
@@ -236,18 +234,17 @@ public class SimulationMonitor {
                         nextObject = puppies.get(0);
                     }
                 }
-                //m.render();
             } else {
                 Puppy p = (Puppy) nextObject;
-                System.out.println("puppy," + p.getId());
+                Main.writeln("puppy," + p.getId());
                 Location oldLocation = p.getLocation();
                 String action = p.pollForAction();
                 if (action.equals("stay")) {
-                    System.out.println(action);
+                    Main.writeln(action);
                 } else {
                     Location newLocation = p.getLocation();
                     updateMowersAfterPuppyMoves(oldLocation, newLocation);
-                    System.out.println(action + "," + p.getLocation());
+                    Main.writeln(action + "," + p.getLocation());
                 }
                 int nextPuppyId = p.getId() + 1;
                 if (nextPuppyId <= puppies.size()) {
@@ -256,7 +253,7 @@ public class SimulationMonitor {
                     turnCount++;
                     nextObject = mowers.get(0);
                 }
-                System.out.println("ok");
+                Main.writeln("ok");
             }
         }
 

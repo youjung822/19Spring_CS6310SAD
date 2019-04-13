@@ -5,13 +5,31 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Main {
     private static ImageIcon puppyIcon = loadIcon("images/puppy.png");
     private static ImageIcon craterIcon = loadIcon("images/crater.png");
     private static ImageIcon mowerIcon = loadIcon("images/mower.png");
     private static ImageIcon puppyMowerIcon = loadIcon("images/puppyMower.png");
+
+    private static BufferedWriter writer = null;
+
+    public static void write(String message) {
+        try {
+            writer.write(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeln(String message) {
+        write(message);
+        write("\n");
+    }
 
     private static ImageIcon loadIcon(String path) {
         try {
@@ -23,7 +41,6 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {
         }
@@ -115,7 +132,13 @@ public class Main {
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    System.out.println(monitor.report());
+                    if (writer != null) {
+                        write(monitor.report());
+                        writer.close();
+                        writer = null;
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Simulation has ended");
+                    }
                 } catch (Exception ex) {
                     //do nothing
                 }
@@ -131,6 +154,11 @@ public class Main {
                 try {
                     monitor.fastForward();
                     render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
+                    if (writer != null) {
+                        write(monitor.report());
+                        writer.close();
+                        writer = null;
+                    }
                 } catch (Exception ex) {
                     //do nothing
                 }
@@ -153,6 +181,12 @@ public class Main {
 
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = jfc.getSelectedFile();
+                    try {
+                        writer = new BufferedWriter(new FileWriter(selectedFile.getAbsoluteFile() + ".output"));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+
                     frame.setTitle("OsMowSis: " + selectedFile.getName());
                     monitor.setupUsingFile(selectedFile.getAbsolutePath());
                     render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
