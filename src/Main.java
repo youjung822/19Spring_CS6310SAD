@@ -21,6 +21,7 @@ public class Main {
     public static void write(String message) {
         try {
             writer.write(message);
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
