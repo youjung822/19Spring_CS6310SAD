@@ -184,13 +184,13 @@ public class Main {
                     File selectedFile = jfc.getSelectedFile();
                     try {
                         writer = new BufferedWriter(new FileWriter(selectedFile.getAbsoluteFile() + ".output"));
-                    } catch (IOException ex) {
+                        frame.setTitle("OsMowSis: " + selectedFile.getName());
+                        monitor.setupUsingFile(selectedFile.getAbsolutePath());
+                        render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
+                    } catch (Exception ex) {
                         ex.printStackTrace();
+                        JOptionPane.showMessageDialog(frame, "Invalid input file! Please see console for more details.");
                     }
-
-                    frame.setTitle("OsMowSis: " + selectedFile.getName());
-                    monitor.setupUsingFile(selectedFile.getAbsolutePath());
-                    render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                 }
             }
         });
