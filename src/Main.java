@@ -18,18 +18,14 @@ public class Main {
 
     private static BufferedWriter writer = null;
 
-    public static void write(String message) {
+    public static void writeln(String message) {
         try {
             writer.write(message);
+            writer.write("\n");
             writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void writeln(String message) {
-        write(message);
-        write("\n");
     }
 
     private static ImageIcon loadIcon(String path) {
@@ -134,7 +130,7 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (writer != null) {
-                        write(monitor.report());
+                        writeln(monitor.report());
                         writer.close();
                         writer = null;
                     } else {
@@ -156,7 +152,7 @@ public class Main {
                     monitor.fastForward();
                     render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                     if (writer != null) {
-                        write(monitor.report());
+                        writeln(monitor.report());
                         writer.close();
                         writer = null;
                     }
@@ -292,7 +288,7 @@ public class Main {
         //Status panel
         statusPanel.removeAll();
 
-        String[] columnNames = {"Mower ID", "Status", "Rem. Turns"};
+        String[] columnNames = {"Mower", "Status", "Delay"};
 
         Object[][] data = new Object[monitor.getMowers().size()][3];
 
@@ -319,9 +315,9 @@ public class Main {
         statusPanel.add(table.getTableHeader(), BorderLayout.PAGE_START);
         statusPanel.add(table, BorderLayout.CENTER);
 
+        table.getColumnModel().getColumn(0).setMaxWidth(50);
         table.getColumnModel().getColumn(0).setMaxWidth(100);
         table.getColumnModel().getColumn(0).setMaxWidth(100);
-        table.getColumnModel().getColumn(0).setMaxWidth(200);
         table.setRowHeight(60);
 
         frame.repaint();

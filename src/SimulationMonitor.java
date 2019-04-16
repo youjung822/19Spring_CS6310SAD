@@ -1,5 +1,6 @@
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SimulationMonitor {
 
@@ -33,97 +34,113 @@ public class SimulationMonitor {
         return isStopped;
     }
 
-    public void setupUsingFile(String filePath) {
+    private void validate(String fieldName, int actual, int min, int max) throws Exception {
+        if (actual < min || actual > max) {
+            throw new Exception(fieldName + "(" + actual + ") needs to be between " + min + " and " + max + " (inclusive).");
+        }
+    }
+
+    public void setupUsingFile(String filePath) throws Exception {
         turnCount = 0;
         isStopped = false;
 
         final String DELIMITER = ",";
 
-        try {
-            Scanner takeCommand = new Scanner(new File(filePath));
-            String[] tokens;
-            int i, j, k;
+        Scanner takeCommand = new Scanner(new File(filePath));
+        String[] tokens;
+        int i, j, k;
 
-            // read in the lawn information
+        // read in the lawn information
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        int lawnWidth = Integer.parseInt(tokens[0]);
+        validate("lawnWidth", lawnWidth, 1, 15);
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        int lawnHeight = Integer.parseInt(tokens[0]);
+        validate("lawnHeight", lawnHeight, 1, 10);
+
+        // read in the lawnmower starting information
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        int numMowers = Integer.parseInt(tokens[0]);
+        validate("numMowers", numMowers, 0, 10);
+
+        mowers = new ArrayList<>(numMowers);
+
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        collisionDelay = Integer.parseInt(tokens[0]);
+        validate("collisionDelay", collisionDelay, 0, 4);
+
+        MowerSharedState sharedState = new MowerSharedState();
+
+        for (k = 1; k <= numMowers; k++) {
             tokens = takeCommand.nextLine().split(DELIMITER);
-            int lawnWidth = Integer.parseInt(tokens[0]);
+            Location l = new Location(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
+            validate("mower.x", l.getX(), 0, lawnWidth - 1);
+            validate("mower.y", l.getY(), 0, lawnHeight - 1);
+            Direction d = Direction.valueOf(tokens[2]);
+            mowers.add(new Mower(k, l, d, sharedState));
+        }
+
+        // read in the crater information
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        int numCraters = Integer.parseInt(tokens[0]);
+        Set<Location> craters = new HashSet<>(numCraters);
+        for (k = 0; k < numCraters; k++) {
             tokens = takeCommand.nextLine().split(DELIMITER);
-            int lawnHeight = Integer.parseInt(tokens[0]);
+            Location l = new Location(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
 
+            // place a crater at the given location
+            craters.add(l);
+            validate("crater.x", l.getX(), 0, lawnWidth - 1);
+            validate("crater.y", l.getY(), 0, lawnHeight - 1);
+        }
 
-            // read in the lawnmower starting information
+        // read in the puppy information
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        int numPuppies = Integer.parseInt(tokens[0]);
+        validate("numPuppies", numPuppies, 0, 6);
+        puppies = new ArrayList<>(numPuppies);
+
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        int stayPercentage = Integer.parseInt(tokens[0]);
+        validate("stayPercentage", stayPercentage, 0, 100);
+
+        sharedState.setPuppyStayPercentage(stayPercentage);
+
+        for (k = 1; k <= numPuppies; k++) {
             tokens = takeCommand.nextLine().split(DELIMITER);
-            int numMowers = Integer.parseInt(tokens[0]);
-            mowers = new ArrayList<>(numMowers);
+            Location l = new Location(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
+            validate("puppy.x", l.getX(), 0, lawnWidth - 1);
+            validate("puppy.y", l.getY(), 0, lawnHeight - 1);
+            puppies.add(new Puppy(k, stayPercentage, l, this));
+        }
 
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            collisionDelay = Integer.parseInt(tokens[0]);
+        tokens = takeCommand.nextLine().split(DELIMITER);
+        maxTurnCount = Integer.parseInt(tokens[0]);
+        validate("maxTurnCount", maxTurnCount, 0, 300);
 
-            MowerSharedState sharedState = new MowerSharedState();
+        // generate the lawn information
+        Map<Location, Square> squares = new HashMap<>(lawnHeight * lawnWidth);
+        for (i = 0; i < lawnWidth; i++) {
+            for (j = 0; j < lawnHeight; j++) {
 
-            for (k = 1; k <= numMowers; k++) {
-                tokens = takeCommand.nextLine().split(DELIMITER);
-                Location l = new Location(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
-                Direction d = Direction.valueOf(tokens[2]);
-                mowers.add(new Mower(k, l, d, sharedState));
-            }
-
-            // read in the crater information
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            int numCraters = Integer.parseInt(tokens[0]);
-            Set<Location> craters = new HashSet<>(numCraters);
-            for (k = 0; k < numCraters; k++) {
-                tokens = takeCommand.nextLine().split(DELIMITER);
-
-                // place a crater at the given location
-                craters.add(new Location(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1])));
-            }
-
-            // read in the puppy information
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            int numPuppies = Integer.parseInt(tokens[0]);
-            puppies = new ArrayList<>(numPuppies);
-
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            int stayPercentage = Integer.parseInt(tokens[0]);
-
-            sharedState.setPuppyStayPercentage(stayPercentage);
-
-            for (k = 1; k <= numPuppies; k++) {
-                tokens = takeCommand.nextLine().split(DELIMITER);
-                Location l = new Location(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
-                puppies.add(new Puppy(k, stayPercentage, l, this));
-            }
-
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            maxTurnCount = Integer.parseInt(tokens[0]);
-
-            // generate the lawn information
-            Map<Location, Square> squares = new HashMap<>(lawnHeight * lawnWidth);
-            for (i = 0; i < lawnWidth; i++) {
-                for (j = 0; j < lawnHeight; j++) {
-
-                    Location l = new Location(i, j);
-                    if (craters.contains(l)) {
-                        squares.put(l, new CraterSquare());
-                    } else {
-                        squares.put(l, new GrassSquare());
-                    }
+                Location l = new Location(i, j);
+                if (craters.contains(l)) {
+                    squares.put(l, new CraterSquare());
+                } else {
+                    squares.put(l, new GrassSquare());
                 }
             }
-
-            for (Mower mower : mowers) {
-                ((GrassSquare) squares.get(mower.getLocation())).cut();
-            }
-
-            lawn = new Lawn(lawnWidth, lawnHeight, squares);
-
-            takeCommand.close();
-
-            nextObject = mowers.get(0);
-
-        } catch (Exception e) {
         }
+
+        for (Mower mower : mowers) {
+            ((GrassSquare) squares.get(mower.getLocation())).cut();
+        }
+
+        lawn = new Lawn(lawnWidth, lawnHeight, squares);
+
+        takeCommand.close();
+
+        nextObject = mowers.get(0);
     }
 
     public int getGrassRemaining() {
@@ -242,7 +259,11 @@ public class SimulationMonitor {
                 if (action.equals("stay")) {
                     Main.writeln(action);
                 } else {
-                    Location newLocation = p.getLocation();
+                    List<Location> candidates = getLocationsForPuppy(oldLocation);
+                    int cSize = candidates.size();
+                    int cChosen = ThreadLocalRandom.current().nextInt(0, cSize);
+                    Location newLocation = candidates.get(cChosen);
+                    p.setLocation(newLocation);
                     updateMowersAfterPuppyMoves(oldLocation, newLocation);
                     Main.writeln(action + "," + p.getLocation());
                 }
@@ -276,7 +297,7 @@ public class SimulationMonitor {
         return nextObject;
     }
 
-    public List<Location> getLocationsForPuppy(Location l) {
+    private List<Location> getLocationsForPuppy(Location l) {
         Location[] ns = l.getNeighborLocations();
         List<Location> candidates = new ArrayList<>();
         for (Location n : ns) {
