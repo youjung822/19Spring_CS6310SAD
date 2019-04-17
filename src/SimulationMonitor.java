@@ -427,4 +427,72 @@ public class SimulationMonitor {
         }
         return null;
     }
+
+    private boolean isMower(Location l) {
+        for (Mower m : mowers) {
+            if (m.getLocation().equals(l)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void renderMowerState() {
+        if (mowers != null && !mowers.isEmpty()) {
+            MowerSharedState state = mowers.get(0).getSharedState();
+            int i, j;
+            int charWidth = 2 * lawn.getWidth()+2 + 2;
+
+            // display the rows of the lawn from top to bottom
+            for (j = lawn.getHeight()+2 - 1; j >= 0; j--) {
+                renderHorizontalBar(charWidth);
+
+                // display the Y-direction identifier
+                System.out.print(j);
+
+                // display the contents of each square on this row
+                for (i = 0; i < lawn.getWidth()+2; i++) {
+                    System.out.print("|");
+                    if (state.getPuppyLocations().contains(new Location(i, j))) {
+                        System.out.print("P");
+                    } else if (isMower(new Location(i, j))) {
+                        System.out.print("M");
+                    } else {
+
+                        Square s = state.getSquares().get(new Location(i, j));
+                        if (s == null) {
+                            System.out.print("?");
+                        } else if (s instanceof GrassSquare && ((GrassSquare) s).isEmpty()) {
+                            System.out.print(" ");
+                        } else if (s instanceof GrassSquare) {
+                            System.out.print("G");
+                        } else if (s instanceof CraterSquare) {
+                            System.out.print("C");
+                        } else {
+                            System.out.print("F");
+                        }
+                    }
+                }
+                System.out.println("|");
+            }
+            renderHorizontalBar(charWidth);
+
+            // display the column X-direction identifiers
+            System.out.print(" ");
+            for (i = 0; i < lawn.getWidth()+2; i++) {
+                System.out.print(" " + i);
+            }
+            System.out.println();
+        }
+    }
+
+
+    private void renderHorizontalBar(int size) {
+        System.out.print(" ");
+        for (int k = 0; k < size; k++) {
+            System.out.print("-");
+        }
+        System.out.println();
+    }
+
 }

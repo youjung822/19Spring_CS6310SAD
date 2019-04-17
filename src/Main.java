@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Main {
     private static ImageIcon puppyIcon = loadIcon("images/puppy.png");
@@ -206,6 +207,15 @@ public class Main {
         frame.setJMenuBar(mb);
 
         frame.setVisible(true);
+
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print("Press M to print Mowers' Shared State: ");
+            String input = scanner.next();
+            if (input != null && input.trim().equals("M")) {
+                monitor.renderMowerState();
+            }
+        }
     }
 
     private static void render(JTextField turnField, SimulationMonitor monitor, JTextField grassCutField, JTextField grassRemField, JTextField nextTurnField, JPanel lawnPanel, JPanel statusPanel, JFrame frame) {
