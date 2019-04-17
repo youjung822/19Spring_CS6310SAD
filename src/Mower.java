@@ -23,6 +23,10 @@ public class Mower {
         sharedState.register(this);
     }
 
+    public MowerSharedState getSharedState() {
+        return sharedState;
+    }
+
     public int getId() {
         return id;
     }

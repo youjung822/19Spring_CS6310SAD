@@ -17,6 +17,10 @@ public class MowerSharedState {
         return puppyStayPercentage;
     }
 
+    public Set<Location> getPuppyLocations() {
+        return puppyLocations;
+    }
+
     public void setPuppyStayPercentage(int puppyStayPercentage) {
         this.puppyStayPercentage = puppyStayPercentage;
     }
