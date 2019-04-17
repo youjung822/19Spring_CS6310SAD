@@ -441,22 +441,26 @@ public class SimulationMonitor {
         if (mowers != null && !mowers.isEmpty()) {
             MowerSharedState state = mowers.get(0).getSharedState();
             int i, j;
-            int charWidth = 2 * lawn.getWidth()+2 + 2;
+            int charWidth = 2 * lawn.getWidth() + 2 + 2;
 
             // display the rows of the lawn from top to bottom
-            for (j = lawn.getHeight()+2 - 1; j >= 0; j--) {
+            System.out.println("^");
+            System.out.println("*");
+            System.out.println("*");
+            System.out.println("*");
+            for (j = lawn.getHeight() + 2 - 1; j >= 0; j--) {
                 renderHorizontalBar(charWidth);
 
                 // display the Y-direction identifier
                 System.out.print(j);
 
                 // display the contents of each square on this row
-                for (i = 0; i < lawn.getWidth()+2; i++) {
+                for (i = 0; i < lawn.getWidth() + 2; i++) {
                     System.out.print("|");
                     if (state.getPuppyLocations().contains(new Location(i, j))) {
-                        System.out.print("P");
+                        System.out.print("p");
                     } else if (isMower(new Location(i, j))) {
-                        System.out.print("M");
+                        System.out.print("m");
                     } else {
 
                         Square s = state.getSquares().get(new Location(i, j));
@@ -479,10 +483,10 @@ public class SimulationMonitor {
 
             // display the column X-direction identifiers
             System.out.print(" ");
-            for (i = 0; i < lawn.getWidth()+2; i++) {
+            for (i = 0; i < lawn.getWidth() + 2; i++) {
                 System.out.print(" " + i);
             }
-            System.out.println();
+            System.out.println(" * * * >");
         }
     }
 
