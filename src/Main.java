@@ -215,7 +215,7 @@ public class Main {
         while (true) {
             System.out.print("Press m to print Mowers' Shared State: ");
             String input = scanner.next();
-            if (input != null && input.trim().equals("M")) {
+            if (input != null && input.trim().equals("m")) {
                 monitor.renderMowerState();
             }
         }
