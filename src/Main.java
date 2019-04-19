@@ -180,13 +180,15 @@ public class Main {
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = jfc.getSelectedFile();
                     try {
-                        writer = new BufferedWriter(new FileWriter(selectedFile.getAbsoluteFile() + ".output"));
+                        String fileName = selectedFile.getAbsolutePath();
+                        String outName = fileName.substring(0, fileName.length() - 4);
+                        writer = new BufferedWriter(new FileWriter(outName + ".output"));
                         frame.setTitle("OsMowSis: " + selectedFile.getName());
-                        monitor.setupUsingFile(selectedFile.getAbsolutePath());
+                        monitor.setupUsingFile(fileName);
                         render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                     } catch (Exception ex) {
                         System.out.println("\nERROR: " + ex.toString());
-                        System.out.print("Press M to print Mowers' Shared State: ");
+                        System.out.print("Press m to print Mowers' Shared State: ");
                         JOptionPane.showMessageDialog(frame, "Invalid input file! Please see console for more details.");
                     }
                 }
@@ -211,7 +213,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Press M to print Mowers' Shared State: ");
+            System.out.print("Press m to print Mowers' Shared State: ");
             String input = scanner.next();
             if (input != null && input.trim().equals("M")) {
                 monitor.renderMowerState();
