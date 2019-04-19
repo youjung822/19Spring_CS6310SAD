@@ -247,6 +247,7 @@ public class SimulationMonitor {
                 } else {
                     if (puppies.isEmpty()) {
                         nextObject = mowers.get(0);
+                        turnCount++;
                     } else {
                         nextObject = puppies.get(0);
                     }
