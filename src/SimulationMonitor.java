@@ -261,11 +261,18 @@ public class SimulationMonitor {
                 } else {
                     List<Location> candidates = getLocationsForPuppy(oldLocation);
                     int cSize = candidates.size();
-                    int cChosen = ThreadLocalRandom.current().nextInt(0, cSize);
-                    Location newLocation = candidates.get(cChosen);
-                    p.setLocation(newLocation);
+                    Location newLocation = null;
+                    if (cSize > 0) {
+                        int cChosen = ThreadLocalRandom.current().nextInt(0, cSize);
+                        newLocation = candidates.get(cChosen);
+                        p.setLocation(newLocation);
+                        Main.writeln(action + "," + p.getLocation());
+                    } else {
+                        newLocation = oldLocation;
+                        Main.writeln("stay"); // THANK YOU DR. MOSS
+                    }
                     updateMowersAfterPuppyMoves(oldLocation, newLocation);
-                    Main.writeln(action + "," + p.getLocation());
+
                 }
                 int nextPuppyId = p.getId() + 1;
                 if (nextPuppyId <= puppies.size()) {
@@ -282,13 +289,15 @@ public class SimulationMonitor {
     }
 
     private void updateMowersAfterPuppyMoves(Location oldLocation, Location newLocation) {
-        for (Mower m : mowers) {
-            if (m.getLocation().equals(oldLocation)) {
-                m.setStatus(MowerStatus.TurnedOn);
-            }
-            if (m.getLocation().equals(newLocation)) {
-                m.setStatus(MowerStatus.Stalled);
-                m.setRemainingTurnsStalled(0);
+        if (!oldLocation.equals(newLocation)) {
+            for (Mower m : mowers) {
+                if (m.getLocation().equals(oldLocation)) {
+                    m.setStatus(MowerStatus.TurnedOn);
+                }
+                if (m.getLocation().equals(newLocation)) {
+                    m.setStatus(MowerStatus.Stalled);
+                    m.setRemainingTurnsStalled(0);
+                }
             }
         }
     }
