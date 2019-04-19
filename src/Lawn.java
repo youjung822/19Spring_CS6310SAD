@@ -48,7 +48,7 @@ public class Lawn {
     }
 
     public boolean isGrass(Location location) {
-        return location.getY() < width
+        return location.getX() < width
                 && location.getY() < height
                 && squares.containsKey(location)
                 && squares.get(location) instanceof GrassSquare;

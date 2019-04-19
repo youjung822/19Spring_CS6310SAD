@@ -447,7 +447,7 @@ public class SimulationMonitor {
     }
 
     public void renderMowerState() {
-        if (mowers != null && !mowers.isEmpty()) {
+        if (mowers != null && !mowers.isEmpty() && lawn != null) {
             MowerSharedState state = mowers.get(0).getSharedState();
             int i, j;
             int charWidth = 2 * lawn.getWidth() + 2 + 2;

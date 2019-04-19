@@ -185,7 +185,8 @@ public class Main {
                         monitor.setupUsingFile(selectedFile.getAbsolutePath());
                         render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        System.out.println("\nERROR: " + ex.toString());
+                        System.out.print("Press M to print Mowers' Shared State: ");
                         JOptionPane.showMessageDialog(frame, "Invalid input file! Please see console for more details.");
                     }
                 }
