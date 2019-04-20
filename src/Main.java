@@ -65,7 +65,7 @@ public class Main {
         summaryPanel.add(turnField);
 
         JLabel grassRemLabel = new JLabel();
-        grassRemLabel.setText("Grass Squares Remaining: ");
+        grassRemLabel.setText("Remaining Grass Squares: ");
         grassRemLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         grassRemLabel.setFont(grassRemLabel.getFont().deriveFont(Font.BOLD));
         summaryPanel.add(grassRemLabel);
@@ -75,7 +75,7 @@ public class Main {
         summaryPanel.add(grassRemField);
 
         JLabel grassCutLabel = new JLabel();
-        grassCutLabel.setText("Grass Squares Cut: ");
+        grassCutLabel.setText("Cut Grass Squares: ");
         grassCutLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         grassCutLabel.setFont(grassCutLabel.getFont().deriveFont(Font.BOLD));
         summaryPanel.add(grassCutLabel);
@@ -187,9 +187,7 @@ public class Main {
                         monitor.setupUsingFile(fileName);
                         render(turnField, monitor, grassCutField, grassRemField, nextTurnField, lawnPanel, statusPanel, frame);
                     } catch (Exception ex) {
-                        System.out.println("\nERROR: " + ex.toString());
-                        System.out.print("Press m to print Mowers' Shared State: ");
-                        JOptionPane.showMessageDialog(frame, "Invalid input file! Please see console for more details.");
+                        JOptionPane.showMessageDialog(frame, "Invalid input file: " + ex.toString());
                     }
                 }
             }
